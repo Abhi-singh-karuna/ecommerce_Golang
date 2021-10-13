@@ -13,7 +13,7 @@ func CreateData(c *fiber.Ctx) error {
 
 	ConnectDb := config.MI.DB.Collection(os.Getenv("DATABASE_COLLECTION"))
 
-	data := new(models.User)
+	data := new(models.Product)
 
 	c.BodyParser(&data)
 
@@ -21,9 +21,9 @@ func CreateData(c *fiber.Ctx) error {
 
 	result, _ := ConnectDb.InsertOne(c.Context(), data)
 
-	///////////////////////////////////////////////
+	////////////////////////////////////////////////
 
-	content := &models.User{}
+	content := &models.Product{}
 
 	query := bson.D{{Key: "_id", Value: result.InsertedID}}
 
