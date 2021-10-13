@@ -1,0 +1,4 @@
+go.sum
+main.go
+go.mod
+/config
