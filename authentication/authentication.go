@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"net/http"
 	"os"
 	"regexp"
 	"time"
@@ -54,7 +53,7 @@ func SignUp(c *fiber.Ctx) error {
 		return err
 	}
 
-//-----------------------Password Encryption---------------------//
+	//-----------------------Password Encryption---------------------//
 	user.Password = getHash([]byte(user.Password))
 
 	collection := config.MI.DB.Collection(os.Getenv("DATABASE_COLLECTION"))
@@ -63,17 +62,16 @@ func SignUp(c *fiber.Ctx) error {
 		return nil
 	}
 
-//------------Email Validation Using regular expression----------//
+	//------------Email Validation Using regular expression----------//
 	ValidateEmail := user.Email
 
 	CheckEmail := regexp.MustCompile(`^[a-z0-9._\-]+@[a-z0-9\-]+\.[a-z]{2,4}$`)
 
 	Check := (CheckEmail.MatchString(ValidateEmail))
 
-
 	if Check == true {
 
-//-----------Checking if email exist or not in the database------//
+		//-----------Checking if email exist or not in the database------//
 		err1 := collection.FindOne(ctx, bson.M{"email": user.Email}).Err()
 
 		if err1 == nil {
@@ -83,7 +81,7 @@ func SignUp(c *fiber.Ctx) error {
 			return c.JSON(response)
 		}
 
-//-----------Checking if username exist or not in the database------//
+		//-----------Checking if username exist or not in the database------//
 		err2 := collection.FindOne(ctx, bson.M{"username": user.Username}).Err()
 		if err2 == nil {
 			response := models.Response{
@@ -92,7 +90,7 @@ func SignUp(c *fiber.Ctx) error {
 			return c.JSON(response)
 		}
 
-//-----------Inserting the registered user in the database------//
+		//-----------Inserting the registered user in the database------//
 		result, _ := collection.InsertOne(ctx, user)
 
 		if result != nil {
@@ -115,13 +113,13 @@ func CreateToken(userMail string) (string, error) {
 	claims := jwt.MapClaims{}
 	claims["authorized"] = true
 
-//--------------------Token claims to useremail-------------------//
+	//--------------------Token claims to useremail-------------------//
 	claims["user_mail"] = userMail
 
-//--------------------Token Expiration time (Not Secure Method) -------------------//
+	//--------------------Token Expiration time (Not Secure Method) -------------------//
 	claims["exp"] = time.Now().Add(time.Minute * 5).Unix()
 
-//--------------------Validate token for signing in user-------------------//
+	//--------------------Validate token for signing in user-------------------//
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	t, err := token.SignedString([]byte("gosecretkey"))
 	if err != nil {
@@ -147,30 +145,34 @@ func Login(c *fiber.Ctx) error {
 	if cancel == nil {
 		return nil
 	}
-//--------------------Checking if user login email exist in the database-------------------//
+	//--------------------Checking if user login email exist in the database-------------------//
 	err = collection.FindOne(ctx, bson.M{"email": user.Email}).Decode(&dbUser)
 
 	if err != nil {
 		return err
 	}
 
-//-----------------------Checking the password entered is correct or not for the given login email---------------------//
+	//-----------------------Checking the password entered is correct or not for the given login email---------------------//
 	userPass := []byte(user.Password)
 	dbPass := []byte(dbUser.Password)
 
 	passErr := bcrypt.CompareHashAndPassword(dbPass, userPass)
 
 	if passErr != nil {
-		log.Println(passErr)
-		fmt.Println("Wrong Password")
+		c.Status(fiber.StatusBadRequest)
+		return c.JSON(fiber.Map{
+			"message": "Wrong Password",
+		})
 	}
-
-//-----------------------Genrating token for verified user login with the GenerateJWT function---------------------//
-	token, err := CreateToken(u.Email)
+	//-----------------------Genrating token for verified user login with the GenerateJWT function---------------------//
+	validToken, err := CreateToken(u.Email)
 	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity)
-		return err
+		c.Status(fiber.StatusInternalServerError)
+		return c.JSON(fiber.Map{
+			"message": "could not login",
+		})
+	} else {
+		fmt.Fprint(c, validToken)
+		return nil
 	}
-	c.JSON(token)
-	return nil
 }
