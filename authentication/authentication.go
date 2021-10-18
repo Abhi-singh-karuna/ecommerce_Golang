@@ -9,8 +9,8 @@ import (
 	"regexp"
 	"time"
 
-	"github.com/amshashankk/config"
-	"github.com/amshashankk/models"
+	"github.com/Abhi-singh-karuna/Ronin/config"
+	"github.com/Abhi-singh-karuna/Ronin/models"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
 	"golang.org/x/crypto/bcrypt"

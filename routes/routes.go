@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"github.com/amshashankk/authentication"
+	"github.com/Abhi-singh-karuna/Ronin/authentication"
 	"github.com/gofiber/fiber/v2"
 )
 
