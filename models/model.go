@@ -35,3 +35,9 @@ type Add struct {
 	State     *string `json:"state"`
 	PinCode   *int    `json:"pincode"`
 }
+
+type OrderDeatails struct {
+	Name     *string `json:"product_name"`
+	Quantity *int    `json:"Quantity"`
+	Price    int     `json:"price,omitempty" bson:"price,omitempty"`
+}
