@@ -22,7 +22,7 @@ var MI MongoInstance
 
 // ConnectDB - database connection
 func ConnectDB() {
-	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb+srv://keshika:Keshika@cluster0.nlwsi.mongodb.net/"))
+	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb+srv://keshika:Keshika@cluster0.nlwsi.mongodb.net"))
 	if err != nil {
 		log.Fatal(err)
 	}
