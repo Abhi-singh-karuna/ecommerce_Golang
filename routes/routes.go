@@ -7,6 +7,9 @@ import (
 
 func RegisterRoutes(app fiber.Router) {
 
-	app.Post("/insertproduct", c.GetProductList)
-	app.Get("/getproduct",  )
+	app.Post("/insertpro", c.CreateProduct)
+	app.Delete("/deletepro/:id", c.DeleteProduct)
+	app.Get("/getpro", c.GetProduct)
+	app.Put("/updatepro/:id",c.UpdateProduct)
+	app.Get("/getproid/:id", c.GetProductbyid)
 }

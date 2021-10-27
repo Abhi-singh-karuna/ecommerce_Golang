@@ -9,8 +9,10 @@ import (
 func main() {
 
 	app := fiber.New()
+
 	c.ConnectDB()
 	routes.RegisterRoutes(app)
+	//app.Use(logger.New())
 
 	app.Listen(":3001")
 	//fmt.Println("Result of InsertOne")
