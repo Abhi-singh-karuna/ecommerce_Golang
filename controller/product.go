@@ -6,6 +6,8 @@ import (
 	"github.com/KeshikaGupta20/Ronin_Cart/config"
 	"github.com/KeshikaGupta20/Ronin_Cart/models"
 
+	//"golang.org/x/text/message"
+
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -141,19 +143,38 @@ func UpdateProduct(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	data := &models.Product{}
+	data := new(models.Product)
+	c.BodyParser(&data)
 
 	filter := bson.D{{Key: "_id", Value: objectId}}
 
-	update := bson.D{{"$set", bson.D{{"name", "abc"}}}}
+	var message bson.D
 
+	message = append(message, bson.E{Key: "name", Value: data.Name},
+		bson.E{Key: "price", Value: data.Price}, bson.E{Key: "Quantity", Value: data.Quantity},
+		bson.E{Key: "Description", Value: data.Description}, bson.E{Key: "image", Value: data.Image})
+
+	update := bson.D{{"$set", message}}
+	/* update := bson.D{
+	{"$inc", bson.D{
+		{"name", "sony smart television"},
+	}}} */
+	/* update := bson.D{{
+		Key:   "name",
+		Value: data.Name,
+	}} */
+	//ctx, bson.M{"email": user.Email}
 	ProductCollection.UpdateOne(c.Context(), filter, update)
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 
 		"success": true,
 		"data": fiber.Map{
-			"Products": data,
+			"name":        data.Name,
+			"price":       data.Price,
+			"Quantity":    data.Quantity,
+			"Description": data.Description,
+			"image":       data.Image,
 		},
 	})
 }
